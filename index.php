@@ -1,24 +1,7 @@
 <?php
-// Main page only.
-// Header and footer will be handled by other team members.
+$pageTitle = 'Weather App | Dashboard';
+require __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Weather App | Dashboard</title>
-  <meta name="description" content="Weather dashboard project skeleton." />
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
-  <link rel="stylesheet" href="assets/css/style.css" />
-</head>
-
-<body>
-
-  <main class="app-shell container-fluid">
     <!-- Search / Controls -->
     <section class="glass p-3 p-md-4 mb-4" aria-label="City search section">
       <form class="row g-2" id="searchForm">
@@ -88,7 +71,7 @@
         <section class="glass p-3 p-md-4" aria-label="Forecast section">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="h5 m-0">5-Day Forecast</h3>
-            <small class="text-light-emphasis">Static placeholders for now</small>
+            <small class="text-light-emphasis">Placeholders for now</small>
           </div>
 
           <div class="row g-3" id="forecastList">
@@ -122,9 +105,4 @@
         </aside>
       </div>
     </section>
-  </main>
-
-  <script src="assets/js/app.js"></script>
-</body>
-
-</html>
+<?php require __DIR__ . '/includes/footer.php'; ?>
