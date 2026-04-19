@@ -17,12 +17,22 @@
   function renderSavedCities() {
     savedCitiesList.innerHTML = '';
 
-    if (savedCities.length === 0) {
-      var empty = document.createElement('li');
-      empty.className = 'saved-empty';
-      empty.textContent = 'No saved cities yet.';
-      savedCitiesList.appendChild(empty);
-      return;
+    fetch("DB_Ops.php?action=" + "GetSavedCities", {
+        method: "GET"
+    })
+    .then(res => res.json())
+    .then(response => {
+      console.log(response);
+        response.forEach(function (row) {
+          savedCities.push({"city_name" : row["City_Name"], "ID" : row["ID"]});          
+        })
+
+        if (savedCities.length === 0) {
+        var empty = document.createElement('li');
+        empty.className = 'saved-empty';
+        empty.textContent = 'No saved cities yet.';
+        savedCitiesList.appendChild(empty);
+        return;
     }
 
     savedCities.forEach(function (city) {
@@ -32,11 +42,11 @@
       var nameBtn = document.createElement('button');
       nameBtn.type = 'button';
       nameBtn.className = 'btn btn-link p-0 text-decoration-none saved-city-name';
-      nameBtn.textContent = city;
+      nameBtn.textContent = city["city_name"];
       nameBtn.addEventListener('click', function () {
-        cityInput.value = city;
+        cityInput.value = city["city_name"];
         if (cityName) {
-          cityName.textContent = city;
+          cityName.textContent = city["city_name"];
         }
       });
 
@@ -46,16 +56,27 @@
       removeBtn.textContent = 'Remove';
       removeBtn.addEventListener('click', function () {
         savedCities = savedCities.filter(function (itemCity) {
-          return itemCity.toLowerCase() !== city.toLowerCase();
+          return itemCity["city_name"].toLowerCase() !== city["city_name"].toLowerCase();
         });
-        renderSavedCities();
+
+        fetch("DB_Ops.php?action=" + "DeleteCity" + "&ID=" + city["ID"], {
+          method: "GET"
+        })
+        .then(res => res.json())
+        .then(response=> {
+            renderSavedCities();
+      })
       });
 
       item.appendChild(nameBtn);
       item.appendChild(removeBtn);
       savedCitiesList.appendChild(item);
     });
+
+  })
   }
+
+  
 
   function addCurrentCityToSaved() {
     var city = normalizeCity(cityInput.value);
@@ -66,24 +87,21 @@
     });
 
     if (!isDuplicate) {
-      savedCities.unshift(city);
-      renderSavedCities();
+      fetch("DB_Ops.php?action=" + "SaveCity" + "&cityName=" + city, {
+          method: "GET"
+        })
+        .then(res => res.json())
+        .then(response=> {
+            savedCities.unshift({"city_name" : city, "ID" : response["ID"]});
+            renderSavedCities();
+      })
     }
   }
-
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
-    var city = normalizeCity(cityInput.value);
-    if (!city) return;
-
-    if (cityName) {
-      cityName.textContent = city;
-    }
-  });
 
   bookmarkBtn.addEventListener('click', function () {
     addCurrentCityToSaved();
   });
+  
 
   renderSavedCities();
 })();
