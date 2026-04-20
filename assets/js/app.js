@@ -42,13 +42,8 @@
       var nameBtn = document.createElement('button');
       nameBtn.type = 'button';
       nameBtn.className = 'btn btn-link p-0 text-decoration-none saved-city-name';
+      nameBtn.dataset.city = city["city_name"];
       nameBtn.textContent = city["city_name"];
-      nameBtn.addEventListener('click', function () {
-        cityInput.value = city["city_name"];
-        if (cityName) {
-          cityName.textContent = city["city_name"];
-        }
-      });
 
       var removeBtn = document.createElement('button');
       removeBtn.type = 'button';

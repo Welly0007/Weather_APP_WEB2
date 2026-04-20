@@ -1,9 +1,8 @@
-// https://rapidapi.com/maruf111/api/weather-api167
 
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $city = trim($_POST['city']);
+    $city = trim($_POST['city_name']);
 
     // Check if empty
     if (empty($city)) {
@@ -26,34 +25,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Now you can safely use it in API request
 
-   $curl = curl_init();
+    $responses = [];
+
+    $curl = curl_init();
 
     curl_setopt_array($curl, [
-        CURLOPT_URL => "https://weather-api167.p.rapidapi.com/api/weather/forecast?place=$city%2CGB&cnt=3&units=standard&type=three_hour&mode=json&lang=en",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_HTTPHEADER => [
-            "Accept: application/json",
-            "Content-Type: application/json",
-            "x-rapidapi-host: weather-api167.p.rapidapi.com",
-            "x-rapidapi-key: e118051ceemsh2cd558e05d6c14fp1a0b42jsn334814ffb68b"
-        ],
-    ]);
+	CURLOPT_URL => "https://weather-api167.p.rapidapi.com/api/weather/current?place=$city&units=metric&lang=en&mode=json",
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_ENCODING => "",
+	CURLOPT_MAXREDIRS => 10,
+	CURLOPT_TIMEOUT => 30,
+	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	CURLOPT_CUSTOMREQUEST => "GET",
+	CURLOPT_HTTPHEADER => [
+		"Accept: application/json",
+		"Content-Type: application/json",
+		"x-rapidapi-host: weather-api167.p.rapidapi.com",
+		"x-rapidapi-key: f886ea2ee9msh87baa9438eb918dp158aeajsne26b72cf65c7"
+	],
+]);
 
-    $response = curl_exec($curl);
-    $err = curl_error($curl);
+    $response1 = curl_exec($curl);
+    $err1 = curl_error($curl);
+    curl_close($curl);
 
-    //curl_close($curl);
-
-    if ($err) {
-        echo "cURL Error #:" . $err;
-    } else {
-        echo $response;
+    if ($err1) {
+        die("Error in request 1: " . $err1);
     }
 
+    $data1 = json_decode($response1, true);
+
+    // ---------- SECOND REQUEST ----------
+    $curl = curl_init();
+
+    curl_setopt_array($curl, [
+	CURLOPT_URL => "https://weather-api167.p.rapidapi.com/api/weather/forecast?place=$city&cnt=3&units=metric&type=three_hour&mode=json&lang=en",
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_ENCODING => "",
+	CURLOPT_MAXREDIRS => 10,
+	CURLOPT_TIMEOUT => 30,
+	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	CURLOPT_CUSTOMREQUEST => "GET",
+	CURLOPT_HTTPHEADER => [
+		"Accept: application/json",
+		"Content-Type: application/json",
+		"x-rapidapi-host: weather-api167.p.rapidapi.com",
+		"x-rapidapi-key: d36eb47490mshea919ce76c4cbf5p1a4ea3jsn105f45f83b14"
+	],
+]);
+
+    $response2 = curl_exec($curl);
+    $err2 = curl_error($curl);
+    curl_close($curl);
+
+    if ($err2) {
+        die("Error in request 2: " . $err2);
+    }
+
+    $data2 = json_decode($response2, true);
+
+
+    $final = [
+        "current_weather" => $data1,
+        "forecast" => $data2
+    ];
+
+    header('Content-Type: application/json');
+    echo json_encode($final);
 }
 ?>
