@@ -33,42 +33,41 @@
         empty.textContent = 'No saved cities yet.';
         savedCitiesList.appendChild(empty);
         return;
-    }
+      }
     
-    savedCities.forEach(function (city) {
-      var item = document.createElement('li');
-      item.className = 'saved-city-item';
+      savedCities.forEach(function (city) {
+        var item = document.createElement('li');
+        item.className = 'saved-city-item';
 
-      var nameBtn = document.createElement('button');
-      nameBtn.type = 'button';
-      nameBtn.className = 'btn btn-link p-0 text-decoration-none saved-city-name';
-      nameBtn.dataset.city = city["city_name"];
-      nameBtn.textContent = city["city_name"];
+        var nameBtn = document.createElement('button');
+        nameBtn.type = 'button';
+        nameBtn.className = 'btn btn-link p-0 text-decoration-none saved-city-name';
+        nameBtn.dataset.city = city["city_name"];
+        nameBtn.textContent = city["city_name"];
 
-      var removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'saved-remove-btn';
-      removeBtn.textContent = 'Remove';
-      removeBtn.addEventListener('click', function () {
-        savedCities = savedCities.filter(function (itemCity) {
-          return itemCity["city_name"].toLowerCase() !== city["city_name"].toLowerCase();
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'saved-remove-btn';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', function () {
+          savedCities = savedCities.filter(function (itemCity) {
+            return itemCity["city_name"].toLowerCase() !== city["city_name"].toLowerCase();
+          });
+
+          fetch("DB_Ops.php?action=" + "DeleteCity" + "&ID=" + city["ID"], {
+            method: "GET"
+          })
+          .then(res => res.json())
+          .then(response=> {
+              renderSavedCities();
+          })
         });
 
-        fetch("DB_Ops.php?action=" + "DeleteCity" + "&ID=" + city["ID"], {
-          method: "GET"
-        })
-        .then(res => res.json())
-        .then(response=> {
-            renderSavedCities();
-      })
+        item.appendChild(nameBtn);
+        item.appendChild(removeBtn);
+        savedCitiesList.appendChild(item);
       });
-
-      item.appendChild(nameBtn);
-      item.appendChild(removeBtn);
-      savedCitiesList.appendChild(item);
-    });
-
-  })
+    })
   }
 
   function addCurrentCityToSaved() {

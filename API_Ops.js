@@ -1,3 +1,36 @@
+function getDailyForecast(list) {
+    const days = {};
+
+    list.forEach(item => {
+        const date = item.dt_txt.split(" ")[0]; // "YYYY-MM-DD"
+
+        if (!days[date]) {
+        days[date] = {
+            min: Infinity,
+            max: -Infinity,
+        };
+        }
+
+        const temp = item.main.temprature;
+
+        // update min/max
+        days[date].min = Math.min(days[date].min, temp);
+        days[date].max = Math.max(days[date].max, temp);
+    });
+
+        console.log(Object.keys(days));
+
+    // convert object → array
+    return Object.keys(days)
+        .slice(0, 5)
+        .map(date => ({
+        date,
+        min: days[date].min,
+        max: days[date].max
+        }));
+}
+
+
 var getWeather = function(city) {
     fetch("DB_Ops.php?action=LogSearch&cityName=" + city, {
         method: "GET"
@@ -30,7 +63,19 @@ var getWeather = function(city) {
         cards[1].textContent = response.current_weather.wind.speed + " " + response.current_weather.wind.speed_unit;
         cards[2].textContent = response.current_weather.main.pressure + response.current_weather.main.humidity_unit;
         cards[3].textContent = response.current_weather.visibility_distance + " "  + response.current_weather.visibility_unit;
-    })
+
+        const dailyData = getDailyForecast(response.forecast.list);
+        const forecastList = document.querySelectorAll(".forecast-item");        
+
+        dailyData.forEach((day, index) => {
+            const date = new Date(day.date);
+            const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+            const min = day.min;
+            const max = day.max;
+
+            forecastList[index].innerHTML = `${dayName}<br>${max}° / ${min}°`;
+        });
+    });
 }
 
 
