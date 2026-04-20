@@ -7,7 +7,7 @@ require __DIR__ . '/includes/header.php';
       <form class="row g-2" id="searchForm">
         <div class="col-12 col-md-6 col-xl-7">
           <label for="cityInput" class="form-label">Search city</label>
-          <input type="text" id="cityInput" class="form-control" placeholder="e.g., Muscat" />
+          <input type="text" id="cityInput" class="form-control" name="city" placeholder="e.g., Muscat" />
         </div>
         <div class="col-6 col-md-3 col-xl-2 d-grid align-self-end">
           <button type="submit" class="btn btn-info text-dark fw-semibold">Get Weather</button>
