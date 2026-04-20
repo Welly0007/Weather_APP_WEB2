@@ -8,6 +8,7 @@
   </footer>
 
   <script src="assets/js/app.js"></script>
+  <script src="API_Ops.js"></script>
 </body>
 
 </html>

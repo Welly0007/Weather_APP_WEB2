@@ -22,19 +22,19 @@
     })
     .then(res => res.json())
     .then(response => {
-      console.log(response);
-        response.forEach(function (row) {
-          savedCities.push({"city_name" : row["City_Name"], "ID" : row["ID"]});          
-        })
-
-        if (savedCities.length === 0) {
+      savedCities = [];
+      response.forEach(function (row) {
+        savedCities.push({"city_name" : row["City_Name"], "ID" : row["ID"]});
+      })
+      
+      if (savedCities.length === 0) {
         var empty = document.createElement('li');
         empty.className = 'saved-empty';
         empty.textContent = 'No saved cities yet.';
         savedCitiesList.appendChild(empty);
         return;
     }
-
+    
     savedCities.forEach(function (city) {
       var item = document.createElement('li');
       item.className = 'saved-city-item';
@@ -76,18 +76,16 @@
   })
   }
 
-  
-
   function addCurrentCityToSaved() {
     var city = normalizeCity(cityInput.value);
     if (!city) return;
 
     var isDuplicate = savedCities.some(function (item) {
-      return item.toLowerCase() === city.toLowerCase();
+      return item["city_name"].toLowerCase() === city.toLowerCase();
     });
 
     if (!isDuplicate) {
-      fetch("DB_Ops.php?action=" + "SaveCity" + "&cityName=" + city, {
+      fetch("DB_Ops.php?action=" + "SaveCity" + "&cityName=" + city + "&countryCode=200", {
           method: "GET"
         })
         .then(res => res.json())
