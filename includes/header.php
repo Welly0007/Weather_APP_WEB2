@@ -15,9 +15,14 @@
 <body>
   <header class="site-header glass">
     <div class="site-header__inner">
-      <div>
-        <h1 class="site-title m-0">Weather App</h1>
-        <p class="site-subtitle m-0">Weather dashboard layout</p>
+      <div class="d-flex  align-items-center gap-2">
+        <div>
+          <img src="Logo.png" alt="Weather App Logo" class="site-logo" style="width: 60px; height: 60px;" />
+        </div>
+        <div class="d-flex flex-column">
+          <h1 class="site-title m-0">Weather App</h1>
+          <p class="site-subtitle m-0">Weather dashboard layout</p>  
+        </div>
       </div>
       <nav aria-label="Main navigation">
         <ul class="site-nav list-unstyled m-0">

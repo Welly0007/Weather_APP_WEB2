@@ -59,7 +59,7 @@ body {
   color: var(--text);
   text-decoration: none;
   padding: 0.3rem 0.7rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 
 .site-nav__link:hover {
