@@ -173,6 +173,41 @@ body {
   color: #fecaca;
 }
 
+.search-history-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 0.375rem;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+
+.search-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.search-history-list li {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  color: var(--text);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.search-history-list li:hover {
+  background: rgba(51, 65, 85, 0.5);
+}
+
+.search-history-list li:last-child {
+  border-bottom: none;
+}
+
 .glass,
 .site-nav__link,
 .weather-card,

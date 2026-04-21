@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		"Accept: application/json",
 		"Content-Type: application/json",
 		"x-rapidapi-host: weather-api167.p.rapidapi.com",
-		"x-rapidapi-key: 78cb941f06msh2a9c65dcce5b7a2p1d2bd8jsn696443305b3a"
+		"x-rapidapi-key: e492cb988fmsh2546b15eec28ec2p15393djsna021619e9f95"
 	],
 ]);
 
@@ -68,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		"Accept: application/json",
 		"Content-Type: application/json",
 		"x-rapidapi-host: weather-api167.p.rapidapi.com",
-		"x-rapidapi-key: 78cb941f06msh2a9c65dcce5b7a2p1d2bd8jsn696443305b3a"
+		"x-rapidapi-key: e492cb988fmsh2546b15eec28ec2p15393djsna021619e9f95"
 	],
 ]);
 
