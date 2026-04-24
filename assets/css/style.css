@@ -1,3 +1,6 @@
+html {
+  scroll-behavior: smooth;
+}
 :root {
   --bg: #0f172a;
   --panel: #1e293b;
@@ -262,4 +265,23 @@ hr {
   .metric {
     font-size: 1.75rem;
   }
+}
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px rgba(56, 189, 248, 0.4);
+    transform: scale(1.01);
+    border: 5px solid rgba(56, 189, 248, 0.8) !important;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+    transform: scale(1);
+  }
+}
+
+.animate-section {
+  animation: highlightPulse 2s ease-in-out;
 }

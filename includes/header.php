@@ -13,7 +13,7 @@
 </head>
 
 <body>
-  <header class="site-header glass">
+  <header class="navbar sticky-top site-header glass" position="fixed">
     <div class="site-header__inner">
       <div class="d-flex  align-items-center gap-2">
         <div>
@@ -26,9 +26,10 @@
       </div>
       <nav aria-label="Main navigation">
         <ul class="site-nav list-unstyled m-0">
-          <li><a href="#" class="site-nav__link">Home</a></li>
-          <li><a href="#" class="site-nav__link">Forecast</a></li>
-          <li><a href="#" class="site-nav__link">Saved Cities</a></li>
+          <li><a href="#home" class="site-nav__link">Home</a></li>
+          <li><a href="#forecast" class="site-nav__link">Forecast</a></li>
+          <li><a href="#saved" class="site-nav__link">Saved Cities</a></li>
+          <li><a href="#history" class="site-nav__link">History</a></li>
         </ul>
       </nav>
     </div>

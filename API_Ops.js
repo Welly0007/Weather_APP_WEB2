@@ -1,95 +1,176 @@
-function getDailyForecast(list) {
-    const days = {};
-
-    list.forEach(item => {
-        const date = item.dt_txt.split(" ")[0]; // "YYYY-MM-DD"
-
-        if (!days[date]) {
-        days[date] = {
-            min: Infinity,
-            max: -Infinity,
-        };
-        }
-
-        const temp = item.main.temprature;
-
-        // update min/max
-        days[date].min = Math.min(days[date].min, temp);
-        days[date].max = Math.max(days[date].max, temp);
-    });
-
-        console.log(Object.keys(days));
-
-    // convert object → array
-    return Object.keys(days)
-        .slice(0, 5)
-        .map(date => ({
-        date,
-        min: days[date].min,
-        max: days[date].max
-        }));
+async function fetchHistory() {
+  const res = await fetch("DB_Ops.php?action=GetSearchHistory");
+  const history = await res.json();
+  renderHistory(history);
 }
 
+async function deleteHistoryItem(id) {
+  await fetch(`DB_Ops.php?action=DeleteHistoryItem&id=${id}`);
+  fetchHistory();
+}
 
-var getWeather = function(city) {
-    fetch("DB_Ops.php?action=LogSearch&cityName=" + city, {
-        method: "GET"
-    })
-    .then(res => res.json())
-    .then(response => {
-        console.log(response);
-    })
+function renderHistory(history) {
+  const list = document.getElementById("historyList");
+  if (!history || history.length === 0) {
+    list.innerHTML =
+      '<li class="small text-light-emphasis">No recent searches.</li>';
+    return;
+  }
+  list.innerHTML = history
+    .map(
+      (item) => `
+        <li class="d-flex justify-content-between align-items-center mb-2">
+            <span class="cursor-pointer" style="cursor:pointer" onclick="getWeather('${item.City_Name}')">${item.City_Name}</span>
+            <button class="btn-close btn-close-white" style="font-size: 0.6rem;" onclick="deleteHistoryItem(${item.ID})"></button>
+        </li>
+    `
+    )
+    .join("");
+}
 
-    fetch("API_Ops.php", {
-        method: "POST",
-        headers: {
-            "Content-Type" : "application/x-www-form-urlencoded"
-        },
-        body: "city_name=" + encodeURIComponent(city)
-    })
-    .then(res => res.json())
-    .then(response => {
-        console.log(response.current_weather);
-        console.log(response.forecast);
+function getDailyForecast(forecastday) {
+  if (!forecastday) return [];
+  return forecastday.map((item) => ({
+    date: item.date,
+    min: item.day.mintemp_c,
+    max: item.day.maxtemp_c,
+  }));
+}
+function validateCityInput(city) {
+    const trimmedCity = city.trim();
+    
+    if (trimmedCity === "") {
+        alert("Please enter a city name.");
+        return false;
+    }
 
-        document.getElementById("cityName").innerHTML = response.current_weather.name;
-        document.getElementById("dateText").innerHTML = response.current_weather.dt_txt;
-        document.getElementById("temperature").innerHTML = response.current_weather.main.temprature + response.current_weather.main.temprature_unit;
-        document.getElementById("weatherDescription").innerHTML = response.current_weather.weather[0].description;
+    if (trimmedCity.length > 100) {
+        alert("City name is too long (Max 100 characters).");
+        return false;
+    }
 
-        const cards = document.querySelectorAll(".weather-card__value");
 
-        cards[0].textContent = response.current_weather.main.humidity + response.current_weather.main.humidity_unit;
-        cards[1].textContent = response.current_weather.wind.speed + " " + response.current_weather.wind.speed_unit;
-        cards[2].textContent = response.current_weather.main.pressure + response.current_weather.main.humidity_unit;
-        cards[3].textContent = response.current_weather.visibility_distance + " "  + response.current_weather.visibility_unit;
+    const cityRegex = /^[a-zA-Z0-9\s,\.-]+$/;
+    if (!cityRegex.test(trimmedCity)) {
+        alert("Invalid characters detected. Please use only letters and standard punctuation.");
+        return false;
+    }
 
-        const dailyData = getDailyForecast(response.forecast.list);
-        const forecastList = document.querySelectorAll(".forecast-item");        
+    return true;
+}
+var getWeather = function (city) {
+    city = city.replace("`","");
+  if (!validateCityInput(city)) return;
+
+  fetch(
+    "DB_Ops.php?action=LogSearch&cityName=" + encodeURIComponent(city)
+  ).catch(() => {});
+
+  fetch("API_Ops.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: "city_name=" + encodeURIComponent(city),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        alert("API Error: " + data.error.message);
+        return;
+      }
+
+      const locationDisplay = data.location.region
+        ? `${data.location.name}, ${data.location.region}`
+        : data.location.name;
+      document.getElementById("cityName").innerHTML = locationDisplay;
+      document.getElementById("cityInput").value = locationDisplay;
+      document.getElementById("dateText").innerHTML = data.location.localtime;
+      document.getElementById("temperature").innerHTML =
+        Math.round(data.current.temp_c) + "°C";
+      document.getElementById("weatherDescription").innerHTML =
+        data.current.condition.text;
+
+      const cards = document.querySelectorAll(".weather-card__value");
+      if (cards.length >= 4) {
+        cards[0].textContent = data.current.humidity + "%";
+        cards[1].textContent = data.current.wind_kph + " kph";
+        cards[2].textContent = data.current.pressure_mb + " hPa";
+        cards[3].textContent = data.current.vis_km + " km";
+      }
+
+      if (data.forecast && data.forecast.forecastday) {
+        const dailyData = getDailyForecast(data.forecast.forecastday);
+        const forecastList = document.querySelectorAll(".forecast-item");
 
         dailyData.forEach((day, index) => {
-            const date = new Date(day.date);
-            const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
-            const min = day.min;
-            const max = day.max;
-
-            forecastList[index].innerHTML = `${dayName}<br>${max}° / ${min}°`;
+          if (forecastList[index]) {
+            const dateObj = new Date(day.date);
+            const dayName = dateObj.toLocaleDateString("en-US", {
+              weekday: "short",
+            });
+            forecastList[index].innerHTML = `${dayName}<br>${Math.round(
+              day.max
+            )}° / ${Math.round(day.min)}°`;
+          }
         });
+      }
+      fetchHistory();
+    })
+    .catch((error) => {
+      console.error("Critical Error:", error);
+      alert("Check console for the server error response.");
     });
-}
+};
 
+document.addEventListener("DOMContentLoaded", function () {
+  fetchHistory();
+  const form = document.getElementById("searchForm");
+  if (form) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      getWeather(form["city"].value);
+    });
+  }
 
-var form = document.getElementById('searchForm');
+  function loadCurrentLocationWeather() {
+    if (navigator.geolocation) {
+      const geoOptions = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      };
 
-form.addEventListener('submit', function (event){
-    event.preventDefault();
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
 
-    getWeather(form["city"].value);
-});
+          console.log(`Sending Coordinates: Lat ${lat}, Lon ${lon}`);
 
-savedCitiesList.addEventListener('click', function (e) {
-    if (e.target.classList.contains('saved-city-name')) {
-        const selectedCity = e.target.dataset.city;
-        getWeather(selectedCity);
+          getWeather(`${lat},${lon}`);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+        },
+        geoOptions
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
     }
+  }
+
+  const locationBtn = document.getElementById("locationBtn");
+  if (locationBtn) {
+    locationBtn.addEventListener("click", loadCurrentLocationWeather);
+  }
+
+  loadCurrentLocationWeather();
+
+  const savedList = document.getElementById("savedCitiesList");
+  if (savedList) {
+    savedList.addEventListener("click", function (e) {
+      if (e.target.classList.contains("saved-city-name")) {
+        getWeather(e.target.dataset.city);
+      }
+    });
+  }
 });
