@@ -71,6 +71,7 @@
   }
 
   function saveSearchHistory(city) {
+    console.log("save H func");
     city = city.replaceAll("`", "");
     if (!validateCityInput(city)) return;
 
@@ -274,10 +275,11 @@
   });
 
   form.addEventListener("submit", function (event) {
+    console.log("save history");
     city = cityInput.value.replaceAll("`", "");
     if (!validateCityInput(city)) return;
 
-    saveSearchHistory(city);
+    //saveSearchHistory(city);
   });
   async function fetchHistory() {
     const res = await fetch("DB_Ops.php?action=GetSearchHistory");
