@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(0);
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -9,20 +9,18 @@ $conn = new mysqli($host, $username, $password, $dbname) or die("Connection fail
 
 header("Content-Type: application/json");
 
-# Start Saved Cities Operations
+function SaveCity($cityName, $CountryCode)
+{
 
-function SaveCity($cityName, $CountryCode) {
+    $NewCityName = htmlspecialchars(trim($cityName), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $NewCountryCode = htmlspecialchars(trim($CountryCode), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-    $NewCityName = trim($cityName);
-    $NewCountryCode = trim($CountryCode);
-
-    if(empty($NewCityName) || empty($NewCountryCode)) {
+    if (empty($NewCityName) || empty($NewCountryCode)) {
         return [
             "status" => "error",
             "message" => "City name And country code cannot be empty."
         ];
-    }
-    else if(strlen($NewCityName) > 100 || strlen($NewCountryCode) > 10) {
+    } else if (strlen($NewCityName) > 100 || strlen($NewCountryCode) > 10) {
         return [
             "status" => "error",
             "message" => "City name cannot exceed 100 characters and country code cannot exceed 10 characters."
@@ -36,13 +34,12 @@ function SaveCity($cityName, $CountryCode) {
     $Result = $stmt->execute();
     $stmt->close();
 
-    if($Result === false) {
+    if ($Result === false) {
         return [
             "status" => "error",
             "message" => "Failed to save city. Please try again."
         ];
-    }
-    else {
+    } else {
         return [
             "status" => "success",
             "message" => "City saved successfully."
@@ -50,23 +47,25 @@ function SaveCity($cityName, $CountryCode) {
     }
 }
 
-function GetSavedCities() {
+function GetSavedCities()
+{
     global $conn;
     $sql = "SELECT ID,City_Name, Country_Code FROM saved_cities";
     $result = $conn->query($sql);
     $cities = [];
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             $cities[] = $row;
         }
     }
     return json_encode($cities);
 }
 
-function GetSavedCity($ID) {
+function GetSavedCity($ID)
+{
     $NewID = intval($ID);
 
-    if($NewID <= 0) {
+    if ($NewID <= 0) {
         return [
             "status" => "error",
             "message" => "Invalid city ID."
@@ -85,22 +84,22 @@ function GetSavedCity($ID) {
     }
     $stmt->close();
 
-    if($city === null) {
+    if ($city === null) {
         return [
             "status" => "error",
             "message" => "City not found."
         ];
-    }
-    else {
+    } else {
         return json_encode($city);
     }
 }
 
-function DeleteCity($ID) {
+function DeleteCity($ID)
+{
 
     $NewID = intval($ID);
 
-    if($NewID <= 0) {
+    if ($NewID <= 0) {
         return [
             "status" => "error",
             "message" => "Invalid city ID."
@@ -115,13 +114,12 @@ function DeleteCity($ID) {
     $Result = $stmt->execute();
     $stmt->close();
 
-    if($Result === false) {
+    if ($Result === false) {
         return [
             "status" => "error",
             "message" => "Failed to delete city. Please try again."
         ];
-    }
-    else {
+    } else {
         return [
             "status" => "success",
             "message" => "City deleted successfully."
@@ -129,23 +127,22 @@ function DeleteCity($ID) {
     }
 }
 
-function UpdateCityName($ID, $NewCityName){
+function UpdateCityName($ID, $NewCityName)
+{
     $NewID = intval($ID);
-    $TrimmedCityName = trim($NewCityName);
+    $TrimmedCityName = htmlspecialchars(trim($NewCityName), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-    if($NewID <= 0) {
+    if ($NewID <= 0) {
         return [
             "status" => "error",
             "message" => "Invalid city ID."
         ];
-    }
-    else if(empty($TrimmedCityName)) {
+    } else if (empty($TrimmedCityName)) {
         return [
             "status" => "error",
             "message" => "City name cannot be empty."
         ];
-    }
-    else if(strlen($TrimmedCityName) > 100) {
+    } else if (strlen($TrimmedCityName) > 100) {
         return [
             "status" => "error",
             "message" => "City name cannot exceed 100 characters."
@@ -159,13 +156,12 @@ function UpdateCityName($ID, $NewCityName){
     $Result = $stmt->execute();
     $stmt->close();
 
-    if($Result === false) {
+    if ($Result === false) {
         return [
             "status" => "error",
             "message" => "Failed to update city name. Please try again."
         ];
-    }
-    else {
+    } else {
         return [
             "status" => "success",
             "message" => "City name updated successfully."
@@ -174,20 +170,17 @@ function UpdateCityName($ID, $NewCityName){
 
 }
 
-# End Saved Cities Operations
 
-# Start Search History Operations
+function LogSearch($CityName)
+{
+    $TrimmedCityName = htmlspecialchars(trim($CityName), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-function LogSearch($CityName){
-    $TrimmedCityName = trim($CityName);
-
-    if(empty($TrimmedCityName)) {
+    if (empty($TrimmedCityName)) {
         return [
             "status" => "error",
             "message" => "City name cannot be empty."
         ];
-    }
-    else if(strlen($TrimmedCityName) > 100) {
+    } else if (strlen($TrimmedCityName) > 100) {
         return [
             "status" => "error",
             "message" => "City name cannot exceed 100 characters."
@@ -201,13 +194,12 @@ function LogSearch($CityName){
     $Result = $stmt->execute();
     $stmt->close();
 
-    if($Result === false) {
+    if ($Result === false) {
         return [
             "status" => "error",
             "message" => "Failed to log search. Please try again."
         ];
-    }
-    else {
+    } else {
         return [
             "status" => "success",
             "message" => "Search logged successfully."
@@ -215,43 +207,52 @@ function LogSearch($CityName){
     }
 }
 
-function GetSearchHistory() {
+function GetSearchHistory()
+{
     global $conn;
-    $sql = "SELECT City_Name, Searched_at FROM search_history ORDER BY Searched_at DESC";
+    $sql = "SELECT * FROM search_history ORDER BY Searched_at DESC";
     $result = $conn->query($sql);
     $history = [];
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             $history[] = $row;
         }
     }
     return json_encode($history);
 }
 
-function ClearSearchHistory() {
+function ClearSearchHistory()
+{
     global $conn;
     $sql = "DELETE FROM search_history";
     $Result = $conn->query($sql);
 
-    if($Result === false) {
+    if ($Result === false) {
         return [
             "status" => "error",
             "message" => "Failed to clear search history. Please try again."
         ];
-    }
-    else {
+    } else {
         return [
             "status" => "success",
             "message" => "Search history cleared successfully."
         ];
     }
 }
+function DeleteHistoryItem($ID)
+{
+    global $conn;
+    $id = intval($ID);
+    $sql = "DELETE FROM search_history WHERE ID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $result = $stmt->execute();
+    $stmt->close();
+    return ["status" => $result ? "success" : "error"];
+}
 
-# End Search History Operations
 
-# Action Router
-
-$action = $_REQUEST['action'] ?? '';
+$action = htmlspecialchars($_REQUEST['action'] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
 switch ($action) {
     case 'SaveCity':
@@ -275,6 +276,9 @@ switch ($action) {
         break;
     case 'GetSearchHistory':
         $response = GetSearchHistory();
+        break;
+    case 'DeleteHistoryItem':
+        $response = DeleteHistoryItem($_REQUEST['id'] ?? '');
         break;
     case 'ClearSearchHistory':
         $response = ClearSearchHistory();
