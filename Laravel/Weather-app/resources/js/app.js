@@ -1,357 +1,362 @@
-(function () {
-  var form = document.getElementById("searchForm");
-  var cityInput = document.getElementById("cityInput");
-  var cityName = document.getElementById("cityName");
-  var bookmarkBtn = document.getElementById("bookmarkBtn");
-  var savedCitiesList = document.getElementById("savedCitiesList");
-  var searchHistoryDropdown = document.getElementById("searchHistoryDropdown");
-  var searchHistoryList = document.getElementById("searchHistoryList");
-  var clearHistory = document.getElementById("clear");
 
-  function validateCityInput(city) {
-    const trimmedCity = city.trim();
 
-    if (trimmedCity === "") {
-      alert("Please enter a city name.");
-      return false;
-    }
+ import './Api_Ops';
 
-    if (trimmedCity.length > 100) {
-      alert("City name is too long (Max 100 characters).");
-      return false;
-    }
 
-    const cityRegex = /^[a-zA-Z0-9\s,\.-]+$/;
-    if (!cityRegex.test(trimmedCity)) {
-      alert(
-        "Invalid characters detected. Please use only letters and standard punctuation."
-      );
-      return false;
-    }
+// (function () {
+//   var form = document.getElementById("searchForm");
+//   var cityInput = document.getElementById("cityInput");
+//   var cityName = document.getElementById("cityName");
+//   var bookmarkBtn = document.getElementById("bookmarkBtn");
+//   var savedCitiesList = document.getElementById("savedCitiesList");
+//   var searchHistoryDropdown = document.getElementById("searchHistoryDropdown");
+//   var searchHistoryList = document.getElementById("searchHistoryList");
+//   var clearHistory = document.getElementById("clear");
 
-    return true;
-  }
-  if (
-    !form ||
-    !cityInput ||
-    !savedCitiesList ||
-    !bookmarkBtn ||
-    !searchHistoryDropdown ||
-    !searchHistoryList
-  )
-    return;
+//   function validateCityInput(city) {
+//     const trimmedCity = city.trim();
 
-  var savedCities = [];
-  var searchHistory = [];
+//     if (trimmedCity === "") {
+//       alert("Please enter a city name.");
+//       return false;
+//     }
 
-  function loadSearchHistory() {
-    fetch("DB_Ops.php?action=GetSearchHistory", {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        var cities = response.map((item) => item.City_Name);
-        var unique = [];
-        var seen = new Set();
-        for (var i = cities.length - 1; i >= 0; i--) {
-          var city = cities[i];
-          if (!seen.has(city.toLowerCase())) {
-            seen.add(city.toLowerCase());
-            unique.unshift(city);
-          }
-        }
-        searchHistory = unique;
-        console.log("Loaded search history:", searchHistory);
-      })
-      .catch((err) => console.error("Failed to load search history:", err));
-  }
+//     if (trimmedCity.length > 100) {
+//       alert("City name is too long (Max 100 characters).");
+//       return false;
+//     }
 
-  function normalizeCity(value) {
-    return (value || "").replace(/\s+/g, " ").trim();
-  }
+//     const cityRegex = /^[a-zA-Z0-9\s,\.-]+$/;
+//     if (!cityRegex.test(trimmedCity)) {
+//       alert(
+//         "Invalid characters detected. Please use only letters and standard punctuation."
+//       );
+//       return false;
+//     }
 
-  function saveSearchHistory(city) {
-    console.log("save H func");
-    city = city.replaceAll("`", "");
-    if (!validateCityInput(city)) return;
+//     return true;
+//   }
+//   if (
+//     !form ||
+//     !cityInput ||
+//     !savedCitiesList ||
+//     !bookmarkBtn ||
+//     !searchHistoryDropdown ||
+//     !searchHistoryList
+//   )
+//     return;
 
-    fetch("DB_Ops.php?action=LogSearch&cityName=" + encodeURIComponent(city), {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        if (response.status === "success") {
-          searchHistory = searchHistory.filter(function (item) {
-            return item.toLowerCase() !== city.toLowerCase();
-          });
-          searchHistory.unshift(city);
-          if (searchHistory.length > 10) {
-            searchHistory = searchHistory.slice(0, 10);
-          }
-        }
-      })
-      .catch((err) => console.error("Failed to save search history:", err));
-  }
+//   var savedCities = [];
+//   var searchHistory = [];
 
-  function showSearchHistory() {
-    searchHistoryList.innerHTML = "";
+//   function loadSearchHistory() {
+//     fetch("DB_Ops.php?action=GetSearchHistory", {
+//       method: "GET",
+//     })
+//       .then((res) => res.json())
+//       .then((response) => {
+//         var cities = response.map((item) => item.City_Name);
+//         var unique = [];
+//         var seen = new Set();
+//         for (var i = cities.length - 1; i >= 0; i--) {
+//           var city = cities[i];
+//           if (!seen.has(city.toLowerCase())) {
+//             seen.add(city.toLowerCase());
+//             unique.unshift(city);
+//           }
+//         }
+//         searchHistory = unique;
+//         console.log("Loaded search history:", searchHistory);
+//       })
+//       .catch((err) => console.error("Failed to load search history:", err));
+//   }
 
-    if (searchHistory.length === 0) {
-      var empty = document.createElement("li");
-      empty.textContent = "No search history";
-      empty.style.padding = "0.5rem 0.75rem";
-      empty.style.color = "var(--muted)";
-      empty.style.textAlign = "center";
-      searchHistoryList.appendChild(empty);
-    } else {
-      searchHistory.forEach(function (city) {
-        var item = document.createElement("li");
-        item.textContent = city;
-        item.addEventListener("click", function () {
-          cityInput.value = city;
-          hideSearchHistory();
-          cityInput.focus();
-        });
-        searchHistoryList.appendChild(item);
-      });
-    }
+//   function normalizeCity(value) {
+//     return (value || "").replace(/\s+/g, " ").trim();
+//   }
 
-    searchHistoryDropdown.style.display = "block";
-  }
+//   function saveSearchHistory(city) {
+//     console.log("save H func");
+//     city = city.replaceAll("`", "");
+//     if (!validateCityInput(city)) return;
 
-  function hideSearchHistory() {
-    searchHistoryDropdown.style.display = "none";
-  }
+//     fetch("DB_Ops.php?action=LogSearch&cityName=" + encodeURIComponent(city), {
+//       method: "GET",
+//     })
+//       .then((res) => res.json())
+//       .then((response) => {
+//         if (response.status === "success") {
+//           searchHistory = searchHistory.filter(function (item) {
+//             return item.toLowerCase() !== city.toLowerCase();
+//           });
+//           searchHistory.unshift(city);
+//           if (searchHistory.length > 10) {
+//             searchHistory = searchHistory.slice(0, 10);
+//           }
+//         }
+//       })
+//       .catch((err) => console.error("Failed to save search history:", err));
+//   }
 
-  function renderSavedCities() {
-    savedCitiesList.innerHTML = "";
+//   function showSearchHistory() {
+//     searchHistoryList.innerHTML = "";
 
-    fetch("DB_Ops.php?action=" + "GetSavedCities", {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        savedCities = [];
-        response.forEach(function (row) {
-          savedCities.push({ city_name: row["City_Name"], ID: row["ID"] });
-        });
+//     if (searchHistory.length === 0) {
+//       var empty = document.createElement("li");
+//       empty.textContent = "No search history";
+//       empty.style.padding = "0.5rem 0.75rem";
+//       empty.style.color = "var(--muted)";
+//       empty.style.textAlign = "center";
+//       searchHistoryList.appendChild(empty);
+//     } else {
+//       searchHistory.forEach(function (city) {
+//         var item = document.createElement("li");
+//         item.textContent = city;
+//         item.addEventListener("click", function () {
+//           cityInput.value = city;
+//           hideSearchHistory();
+//           cityInput.focus();
+//         });
+//         searchHistoryList.appendChild(item);
+//       });
+//     }
 
-        if (savedCities.length === 0) {
-          var empty = document.createElement("li");
-          empty.className = "saved-empty";
-          empty.textContent = "No saved cities yet.";
-          savedCitiesList.appendChild(empty);
-          return;
-        }
+//     searchHistoryDropdown.style.display = "block";
+//   }
 
-        savedCities.forEach(function (city) {
-          var item = document.createElement("li");
-          item.className = "saved-city-item";
+//   function hideSearchHistory() {
+//     searchHistoryDropdown.style.display = "none";
+//   }
 
-          var nameBtn = document.createElement("button");
-          nameBtn.type = "button";
-          nameBtn.className =
-            "btn btn-link p-0 text-decoration-none saved-city-name";
-          nameBtn.dataset.city = city["city_name"];
-          nameBtn.textContent = city["city_name"];
+//   function renderSavedCities() {
+//     savedCitiesList.innerHTML = "";
 
-          var removeBtn = document.createElement("button");
-          removeBtn.type = "button";
-          removeBtn.className = "saved-remove-btn";
-          removeBtn.textContent = "Remove";
-          removeBtn.addEventListener("click", function () {
-            savedCities = savedCities.filter(function (itemCity) {
-              return (
-                itemCity["city_name"].toLowerCase() !==
-                city["city_name"].toLowerCase()
-              );
-            });
+//     fetch("DB_Ops.php?action=" + "GetSavedCities", {
+//       method: "GET",
+//     })
+//       .then((res) => res.json())
+//       .then((response) => {
+//         savedCities = [];
+//         response.forEach(function (row) {
+//           savedCities.push({ city_name: row["City_Name"], ID: row["ID"] });
+//         });
 
-            fetch("DB_Ops.php?action=" + "DeleteCity" + "&ID=" + city["ID"], {
-              method: "GET",
-            })
-              .then((res) => res.json())
-              .then((response) => {
-                renderSavedCities();
-              });
-          });
-          var editBtn = document.createElement("button");
-          editBtn.type = "button";
-          editBtn.className =
-            "saved-edit-btn btn btn-sm btn-outline-warning ms-2";
-          editBtn.textContent = "Rename";
-          editBtn.addEventListener("click", function () {
-            var newName = prompt(
-              "Enter a new name for this saved city:",
-              city["city_name"]
-            );
+//         if (savedCities.length === 0) {
+//           var empty = document.createElement("li");
+//           empty.className = "saved-empty";
+//           empty.textContent = "No saved cities yet.";
+//           savedCitiesList.appendChild(empty);
+//           return;
+//         }
 
-            if (
-              newName &&
-              newName.trim() !== "" &&
-              newName.trim() !== city["city_name"]
-            ) {
-              fetch(
-                "DB_Ops.php?action=UpdateCityName&id=" +
-                  city["ID"] +
-                  "&newCityName=" +
-                  encodeURIComponent(newName.trim()),
-                {
-                  method: "GET",
-                }
-              )
-                .then((res) => res.json())
-                .then((response) => {
-                  if (response.status === "success") {
-                    renderSavedCities();
-                  } else {
-                    alert("Error updating city: " + response.message);
-                  }
-                })
-                .catch((err) => console.error("Failed to update city:", err));
-            }
-          });
+//         savedCities.forEach(function (city) {
+//           var item = document.createElement("li");
+//           item.className = "saved-city-item";
 
-          item.appendChild(nameBtn);
-          item.appendChild(removeBtn);
-          item.appendChild(editBtn);
+//           var nameBtn = document.createElement("button");
+//           nameBtn.type = "button";
+//           nameBtn.className =
+//             "btn btn-link p-0 text-decoration-none saved-city-name";
+//           nameBtn.dataset.city = city["city_name"];
+//           nameBtn.textContent = city["city_name"];
 
-          savedCitiesList.appendChild(item);
-        });
-      });
-  }
+//           var removeBtn = document.createElement("button");
+//           removeBtn.type = "button";
+//           removeBtn.className = "saved-remove-btn";
+//           removeBtn.textContent = "Remove";
+//           removeBtn.addEventListener("click", function () {
+//             savedCities = savedCities.filter(function (itemCity) {
+//               return (
+//                 itemCity["city_name"].toLowerCase() !==
+//                 city["city_name"].toLowerCase()
+//               );
+//             });
 
-  function addCurrentCityToSaved() {
-    city = cityInput.value.replaceAll("`", "");
-    console.log(city);
-    if (!validateCityInput(city)) return;
+//             fetch("DB_Ops.php?action=" + "DeleteCity" + "&ID=" + city["ID"], {
+//               method: "GET",
+//             })
+//               .then((res) => res.json())
+//               .then((response) => {
+//                 renderSavedCities();
+//               });
+//           });
+//           var editBtn = document.createElement("button");
+//           editBtn.type = "button";
+//           editBtn.className =
+//             "saved-edit-btn btn btn-sm btn-outline-warning ms-2";
+//           editBtn.textContent = "Rename";
+//           editBtn.addEventListener("click", function () {
+//             var newName = prompt(
+//               "Enter a new name for this saved city:",
+//               city["city_name"]
+//             );
 
-    var isDuplicate = savedCities.some(function (item) {
-      return item["city_name"].toLowerCase() === city.toLowerCase();
-    });
+//             if (
+//               newName &&
+//               newName.trim() !== "" &&
+//               newName.trim() !== city["city_name"]
+//             ) {
+//               fetch(
+//                 "DB_Ops.php?action=UpdateCityName&id=" +
+//                   city["ID"] +
+//                   "&newCityName=" +
+//                   encodeURIComponent(newName.trim()),
+//                 {
+//                   method: "GET",
+//                 }
+//               )
+//                 .then((res) => res.json())
+//                 .then((response) => {
+//                   if (response.status === "success") {
+//                     renderSavedCities();
+//                   } else {
+//                     alert("Error updating city: " + response.message);
+//                   }
+//                 })
+//                 .catch((err) => console.error("Failed to update city:", err));
+//             }
+//           });
 
-    if (!isDuplicate) {
-      fetch(
-        "DB_Ops.php?action=" +
-          "SaveCity" +
-          "&cityName=" +
-          city +
-          "&countryCode=200",
-        {
-          method: "GET",
-        }
-      )
-        .then((res) => res.json())
-        .then((response) => {
-          savedCities.unshift({ city_name: city, ID: response["ID"] });
-          renderSavedCities();
-        });
-    }
-  }
+//           item.appendChild(nameBtn);
+//           item.appendChild(removeBtn);
+//           item.appendChild(editBtn);
 
-  bookmarkBtn.addEventListener("click", function () {
-    addCurrentCityToSaved();
-  });
+//           savedCitiesList.appendChild(item);
+//         });
+//       });
+//   }
 
-  cityInput.addEventListener("focus", function () {
-    showSearchHistory();
-  });
+//   function addCurrentCityToSaved() {
+//     city = cityInput.value.replaceAll("`", "");
+//     console.log(city);
+//     if (!validateCityInput(city)) return;
 
-  cityInput.addEventListener("input", function () {
-    if (cityInput.value.trim() === "") {
-      showSearchHistory();
-    } else {
-      hideSearchHistory();
-    }
-  });
+//     var isDuplicate = savedCities.some(function (item) {
+//       return item["city_name"].toLowerCase() === city.toLowerCase();
+//     });
 
-  document.addEventListener("click", function (event) {
-    if (
-      !searchHistoryDropdown.contains(event.target) &&
-      event.target !== cityInput
-    ) {
-      hideSearchHistory();
-    }
-  });
+//     if (!isDuplicate) {
+//       fetch(
+//         "DB_Ops.php?action=" +
+//           "SaveCity" +
+//           "&cityName=" +
+//           city +
+//           "&countryCode=200",
+//         {
+//           method: "GET",
+//         }
+//       )
+//         .then((res) => res.json())
+//         .then((response) => {
+//           savedCities.unshift({ city_name: city, ID: response["ID"] });
+//           renderSavedCities();
+//         });
+//     }
+//   }
 
-  form.addEventListener("submit", function (event) {
-    console.log("save history");
-    city = cityInput.value.replaceAll("`", "");
-    if (!validateCityInput(city)) return;
+//   bookmarkBtn.addEventListener("click", function () {
+//     addCurrentCityToSaved();
+//   });
 
-    //saveSearchHistory(city);
-  });
-  async function fetchHistory() {
-    const res = await fetch("DB_Ops.php?action=GetSearchHistory");
-    const history = await res.json();
-    renderHistory(history);
-  }
+//   cityInput.addEventListener("focus", function () {
+//     showSearchHistory();
+//   });
 
-  async function deleteHistoryItem(id) {
-    await fetch(`DB_Ops.php?action=DeleteHistoryItem&id=${id}`);
-    fetchHistory();
-  }
+//   cityInput.addEventListener("input", function () {
+//     if (cityInput.value.trim() === "") {
+//       showSearchHistory();
+//     } else {
+//       hideSearchHistory();
+//     }
+//   });
 
-  function renderHistory(history) {
-    const list = document.getElementById("historyList");
-    if (!history || history.length === 0) {
-      list.innerHTML =
-        '<li class="small text-light-emphasis">No recent searches.</li>';
-      return;
-    }
-    list.innerHTML = history
-      .map(
-        (item) => `
-        <li class="d-flex justify-content-between align-items-center mb-2">
-            <span class="cursor-pointer" style="cursor:pointer" onclick="getWeather('${item.City_Name}')">${item.City_Name}</span>
-            <button class="btn-close btn-close-white" style="font-size: 0.6rem;" onclick="deleteHistoryItem(${item.ID})"></button>
-        </li>
-    `
-      )
-      .join("");
-  }
-  document.getElementById("clear").addEventListener("click", function () {
-    console.log("Clearing...");
-    fetch("DB_Ops.php?action=" + "ClearSearchHistory", {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        fetchHistory();
-      });
-  });
+//   document.addEventListener("click", function (event) {
+//     if (
+//       !searchHistoryDropdown.contains(event.target) &&
+//       event.target !== cityInput
+//     ) {
+//       hideSearchHistory();
+//     }
+//   });
 
-  renderSavedCities();
-  loadSearchHistory();
-})();
+//   form.addEventListener("submit", function (event) {
+//     console.log("save history");
+//     city = cityInput.value.replaceAll("`", "");
+//     if (!validateCityInput(city)) return;
 
-var navLinks = document.querySelectorAll(".site-nav__link");
-var header = document.querySelector(".site-header");
-navLinks.forEach(function (anchor) {
-  anchor.addEventListener("click", function (e) {
-    var targetId = this.getAttribute("href");
+//     //saveSearchHistory(city);
+//   });
+//   async function fetchHistory() {
+//     const res = await fetch("DB_Ops.php?action=GetSearchHistory");
+//     const history = await res.json();
+//     renderHistory(history);
+//   }
 
-    if (targetId.startsWith("#")) {
-      e.preventDefault();
-      var targetSection = document.querySelector(targetId);
-      console.log(targetId);
-      if (targetSection) {
-        var headerHeight = header ? header.offsetHeight : 0;
-        var targetPosition = targetSection.offsetTop - headerHeight - 20; // 20px extra padding
+//   async function deleteHistoryItem(id) {
+//     await fetch(`DB_Ops.php?action=DeleteHistoryItem&id=${id}`);
+//     fetchHistory();
+//   }
 
-        window.scrollTo({
-          top: targetPosition,
-          behavior: "smooth",
-        });
+//   function renderHistory(history) {
+//     const list = document.getElementById("historyList");
+//     if (!history || history.length === 0) {
+//       list.innerHTML =
+//         '<li class="small text-light-emphasis">No recent searches.</li>';
+//       return;
+//     }
+//     list.innerHTML = history
+//       .map(
+//         (item) => `
+//         <li class="d-flex justify-content-between align-items-center mb-2">
+//             <span class="cursor-pointer" style="cursor:pointer" onclick="getWeather('${item.City_Name}')">${item.City_Name}</span>
+//             <button class="btn-close btn-close-white" style="font-size: 0.6rem;" onclick="deleteHistoryItem(${item.ID})"></button>
+//         </li>
+//     `
+//       )
+//       .join("");
+//   }
+//   document.getElementById("clear").addEventListener("click", function () {
+//     console.log("Clearing...");
+//     fetch("DB_Ops.php?action=" + "ClearSearchHistory", {
+//       method: "GET",
+//     })
+//       .then((res) => res.json())
+//       .then((response) => {
+//         fetchHistory();
+//       });
+//   });
 
-        targetSection.classList.remove("animate-section");
-        void targetSection.offsetWidth;
-        targetSection.classList.add("animate-section");
+//   renderSavedCities();
+//   loadSearchHistory();
+// })();
 
-        setTimeout(function () {
-          targetSection.classList.remove("animate-section");
-        }, 3000);
-      }
-    }
-  });
-});
+// var navLinks = document.querySelectorAll(".site-nav__link");
+// var header = document.querySelector(".site-header");
+// navLinks.forEach(function (anchor) {
+//   anchor.addEventListener("click", function (e) {
+//     var targetId = this.getAttribute("href");
+
+//     if (targetId.startsWith("#")) {
+//       e.preventDefault();
+//       var targetSection = document.querySelector(targetId);
+//       console.log(targetId);
+//       if (targetSection) {
+//         var headerHeight = header ? header.offsetHeight : 0;
+//         var targetPosition = targetSection.offsetTop - headerHeight - 20; // 20px extra padding
+
+//         window.scrollTo({
+//           top: targetPosition,
+//           behavior: "smooth",
+//         });
+
+//         targetSection.classList.remove("animate-section");
+//         void targetSection.offsetWidth;
+ //       targetSection.classList.add("animate-section");
+
+//         setTimeout(function () {
+//           targetSection.classList.remove("animate-section");
+//         }, 3000);
+//       }
+//     }
+//   });
+// });
