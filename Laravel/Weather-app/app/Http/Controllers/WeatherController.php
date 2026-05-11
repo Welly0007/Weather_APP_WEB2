@@ -14,14 +14,14 @@ class WeatherController extends Controller
         $this->weatherService = $weatherService;
     }
 
-    public function getWeather(Request $request)
+    public function index(Request $request)
     {
 
         $request->validate([
             'city' => 'required|string'
         ]);
 
-        $city = $request->input('city');
+        $city = $request->city;
 
         $data = $this->weatherService->getWeather($city);
 

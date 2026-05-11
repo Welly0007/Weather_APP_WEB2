@@ -22,7 +22,7 @@
     <div class="site-header__inner">
       <div class="d-flex align-items-center gap-2">
         <div>
-          <img src="{{ Vite::asset('resources/images/Logo.png') }}" alt="Weather App Logo" class="site-logo" style="width: 60px; height: 60px;" />
+          <img src="{{ asset('images/Logo.png') }}" alt="Weather App Logo" class="site-logo" style="width: 60px; height: 60px;" />
         </div>
         <div class="d-flex flex-column">
           <h1 class="site-title m-0">Weather App</h1>

@@ -8,12 +8,12 @@ class WeatherService
 {
     public function getWeather($city)
     {
-        //$apiKey = env('WEATHERAPI_KEY');
-        $apiKey = config('services.weatherapi.key');
+        $apiKey = env('WEATHERAPI_KEY');
+        //$apiKey = config('services.weatherapi.key');
 
         $response = Http::get("https://api.weatherapi.com/v1/forecast.json", [
+            'key' => $apiKey,    
             'q' => $city,
-            'key' => $apiKey,
             'days' => 3,
             'aqi'  => "no",
             'alerts' => "no",

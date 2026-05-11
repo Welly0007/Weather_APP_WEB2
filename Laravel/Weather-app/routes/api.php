@@ -11,5 +11,5 @@ Route::get('/user', function (Request $request) {
 
 
 //Route::post('/Weather', [WeatherController::class, 'getWeather']);
-Route::get('/weather', [WeatherController::class, 'getWeather'])
-    ->name('weather.getWeather');
+Route::post('/weather', [WeatherController::class, 'index'])
+    ->name('weather.index');
