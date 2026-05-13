@@ -36,7 +36,7 @@ class SavedCityController extends Controller
         return response()->json([
             'message' => 'City saved successfully',
             'data' => $city
-        ]);
+        ], 201);
     }
 
     /**

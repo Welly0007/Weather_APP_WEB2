@@ -9,5 +9,7 @@ class Saved_city extends Model
     protected $fillable = [
         'city_name',
         'country_code',
+        'Added_at',
     ];
+    public $timestamps = false;
 }
